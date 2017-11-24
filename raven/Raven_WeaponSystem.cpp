@@ -5,11 +5,11 @@
 #include "armory/Weapon_Blaster.h"
 #include "Raven_Bot.h"
 #include "misc/utils.h"
+#include "misc/Stream_Utility_Functions.h"
 #include "lua/Raven_Scriptor.h"
 #include "Raven_Game.h"
 #include "Raven_UserOptions.h"
 #include "2D/transformations.h"
-
 
 
 //------------------------- ctor ----------------------------------------------
