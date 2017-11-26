@@ -23,6 +23,7 @@ Raven_WeaponSystem::Raven_WeaponSystem(Raven_Bot* owner,
                                                           m_dAimPersistance(AimPersistance)
 {
   Initialize();
+  InitializeFuzzyAimingModule();
 }
 
 //------------------------- dtor ----------------------------------------------
@@ -57,6 +58,89 @@ void Raven_WeaponSystem::Initialize()
   m_WeaponMap[type_shotgun]         = 0;
   m_WeaponMap[type_rail_gun]        = 0;
   m_WeaponMap[type_rocket_launcher] = 0;
+}
+
+//-------------------------  InitializeFuzzyAimingModule ----------------------------
+//
+//  set up some fuzzy variables and rules
+//-----------------------------------------------------------------------------
+void Raven_WeaponSystem::InitializeFuzzyAimingModule()
+{
+	// NOTE: Each variable below has 3 sets. I could have done more,
+	// but that already means writing 27 rules (3^3)...
+
+	FuzzyVariable& DistToTarget = m_FuzzyModule.CreateFLV("DistToTarget");
+
+	// TODO: Modify these values so they still represent a valid set.
+	FzSet& Target_Close = DistToTarget.AddLeftShoulderSet("Target_Close", 0, 25, 150);
+	FzSet& Target_Medium = DistToTarget.AddTriangularSet("Target_Medium", 25, 150, 300);
+	FzSet& Target_Far = DistToTarget.AddRightShoulderSet("Target_Far", 150, 300, 600);
+
+
+	// TODO: Check if this should be the bot's velocity or its target's. 
+	FuzzyVariable& Velocity = m_FuzzyModule.CreateFLV("Velocity");
+
+	// TODO: Change these values (copy/pasted from DistToTarget)
+	FzSet& Slow = Velocity.AddTriangularSet("Slow", 0, 25, 150);
+	FzSet& Jogging = Velocity.AddTriangularSet("Jogging", 25, 150, 300);
+	FzSet& Fast = Velocity.AddRightShoulderSet("Fast", 150, 300, 600);
+
+
+	FuzzyVariable& TimeTargetVisible = m_FuzzyModule.CreateFLV("TimeTargetVisible");
+
+	// TODO: Change these values (copy/pasted from DistToTarget)
+	FzSet& Target_QuickGlance = TimeTargetVisible.AddLeftShoulderSet("QuickGlance", 0, 25, 150);
+	FzSet& Target_GoodView = TimeTargetVisible.AddTriangularSet("GoodView", 25, 150, 300);
+	FzSet& Target_DetailedView = TimeTargetVisible.AddRightShoulderSet("DetailedView", 150, 300, 600);
+
+	FuzzyVariable& AimNoise = m_FuzzyModule.CreateFLV("AimNoise");
+
+	// NOTE: This is called a 'word play'.
+	// TODO: Change these values (from 0 to 1) (later multiplied by m_dAimAccuracy.
+	FzSet& Whisper = AimNoise.AddRightShoulderSet("Whisper", 0, 5, 25);
+	FzSet& JetTakeoff = AimNoise.AddTriangularSet("JetTake-off", 5, 25, 75);
+	FzSet& BarMusic = AimNoise.AddLeftShoulderSet("BarMusic", 25, 75, 100);
+
+
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Close, Slow), Target_QuickGlance), Whisper);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Close, Slow), Target_GoodView), Whisper);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Close, Slow), Target_DetailedView), Whisper);
+
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Close, Jogging), Target_QuickGlance), Whisper);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Close, Jogging), Target_GoodView), Whisper);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Close, Jogging), Target_DetailedView), Whisper);
+
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Close, Fast), Target_QuickGlance), JetTakeoff);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Close, Fast), Target_GoodView), Whisper);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Close, Fast), Target_DetailedView), Whisper);
+
+
+
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Medium, Slow), Target_QuickGlance), JetTakeoff);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Medium, Slow), Target_GoodView), Whisper);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Medium, Slow), Target_DetailedView), Whisper);
+
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Medium, Jogging), Target_QuickGlance), JetTakeoff);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Medium, Jogging), Target_GoodView), JetTakeoff);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Medium, Jogging), Target_DetailedView), Whisper);
+
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Medium, Fast), Target_QuickGlance), JetTakeoff);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Medium, Fast), Target_GoodView), JetTakeoff);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Medium, Fast), Target_DetailedView), JetTakeoff);
+
+
+
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Far, Slow), Target_QuickGlance), BarMusic);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Far, Slow), Target_GoodView), JetTakeoff);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Far, Slow), Target_DetailedView), JetTakeoff);
+
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Far, Jogging), Target_QuickGlance), BarMusic);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Far, Jogging), Target_GoodView), JetTakeoff);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Far, Jogging), Target_DetailedView), JetTakeoff);
+
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Far, Fast), Target_QuickGlance), BarMusic);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Far, Fast), Target_GoodView), BarMusic);
+	m_FuzzyModule.AddRule(FzAND(FzAND(Target_Far, Fast), Target_DetailedView), JetTakeoff);
 }
 
 //-------------------------------- SelectWeapon -------------------------------
@@ -173,7 +257,7 @@ void Raven_WeaponSystem::ChangeWeapon(unsigned int type)
 //  this method aims the bots current weapon at the target (if there is a
 //  target) and, if aimed correctly, fires a round
 //-----------------------------------------------------------------------------
-void Raven_WeaponSystem::TakeAimAndShoot()const
+void Raven_WeaponSystem::TakeAimAndShoot()
 {
   //aim the weapon only if the current target is shootable or if it has only
   //very recently gone out of view (this latter condition is to ensure the 
@@ -238,11 +322,18 @@ void Raven_WeaponSystem::TakeAimAndShoot()const
 //  adds a random deviation to the firing angle not greater than m_dAimAccuracy 
 //  rads
 //-----------------------------------------------------------------------------
-void Raven_WeaponSystem::AddNoiseToAim(Vector2D& AimingPos)const
+void Raven_WeaponSystem::AddNoiseToAim(Vector2D& AimingPos)
 {
   Vector2D toPos = AimingPos - m_pOwner->Pos();
 
-  Vec2DRotateAroundOrigin(toPos, RandInRange(-m_dAimAccuracy, m_dAimAccuracy));
+  //fuzzify distance, velocity and target visible time
+  m_FuzzyModule.Fuzzify("DistToTarget", toPos.Length());
+  m_FuzzyModule.Fuzzify("Velocity", m_pOwner->Velocity);
+  m_FuzzyModule.Fuzzify("TargetVisibleTime", m_pOwner->GetTargetSys()->GetTimeTargetHasBeenVisible());
+
+  double aimNoiseMagnitude = m_FuzzyModule.DeFuzzify("AimNoise", FuzzyModule::max_av) / 100.0;
+
+  Vec2DRotateAroundOrigin(toPos, aimNoiseMagnitude * RandInRange(-m_dAimAccuracy, m_dAimAccuracy));
 
   AimingPos = toPos + m_pOwner->Pos();
 }
