@@ -330,7 +330,8 @@ void Raven_WeaponSystem::AddNoiseToAim(Vector2D& AimingPos)
 
   //fuzzify distance, speed and target visible time
   m_FuzzyModule.Fuzzify("DistToTarget", toPos.Length());
-  m_FuzzyModule.Fuzzify("SpeedRatio", 100.0 * (m_pOwner->Speed() / m_pOwner->MaxSpeed()));
+  // NOTE: This is converted to int to truncate so the ratio is never > 100.
+  m_FuzzyModule.Fuzzify("SpeedRatio", (int) (100 * (m_pOwner->Speed() / m_pOwner->MaxSpeed())));
   m_FuzzyModule.Fuzzify("TimeTargetVisible", m_pOwner->GetTargetSys()->GetTimeTargetHasBeenVisible());
 
   double aimNoiseMagnitude = m_FuzzyModule.DeFuzzify("AimNoise", FuzzyModule::max_av) / 100.0;
