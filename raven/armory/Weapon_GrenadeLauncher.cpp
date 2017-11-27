@@ -19,17 +19,13 @@ GrenadeLauncher::GrenadeLauncher(Raven_Bot*   owner) :
 		script->GetDouble("Grenade_MaxSpeed"),
 		owner)
 {
-	// TODO: Change vertices
 	//setup the vertex buffer
 	const int NumWeaponVerts = 8;
-	const Vector2D weapon[NumWeaponVerts] = { Vector2D(0, -3),
-		Vector2D(6, -3),
-		Vector2D(6, -1),
-		Vector2D(15, -1),
-		Vector2D(15, 1),
-		Vector2D(6, 1),
-		Vector2D(6, 3),
-		Vector2D(0, 3)
+	const Vector2D weapon[NumWeaponVerts] = {
+		Vector2D(0, -5),
+		Vector2D(5, -5),
+		Vector2D(5, 5),
+		Vector2D(0, 5),
 	};
 	for (int vtx = 0; vtx<NumWeaponVerts; ++vtx)
 	{
@@ -53,11 +49,6 @@ inline void GrenadeLauncher::ShootAt(Vector2D pos)
 		m_iNumRoundsLeft--;
 
 		UpdateTimeWeaponIsNextAvailable();
-
-		// TODO: Do this, but only when the grenade has exploded
-		//add a trigger to the game so that the other bots can hear this shot
-		//(provided they are within range)
-		m_pOwner->GetWorld()->GetMap()->AddSoundTrigger(m_pOwner, script->GetDouble("Grenade_SoundRange"));
 	}
 }
 
@@ -160,7 +151,7 @@ void GrenadeLauncher::Render()
 		m_pOwner->Facing().Perp(),
 		m_pOwner->Scale());
 
-	gdi->PurplePen();
+	gdi->DarkGreenBrush();
 
 	gdi->ClosedShape(m_vecWeaponVBTrans);
 }

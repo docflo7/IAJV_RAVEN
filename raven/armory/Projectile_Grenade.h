@@ -19,13 +19,18 @@ class Grenade : public Raven_Projectile
 {
 private:
 
-	//the radius of damage, once the rocket has impacted
+	//the radius of damage, once the grenade has impacted
 	double    m_dBlastRadius;
 
-	//this is used to render the splash when the rocket impacts
+	//this is used to render the splash when the grenade impacts
 	double    m_dCurrentBlastRadius;
 
-	//If the rocket has impacted we test all bots to see if they are within the 
+	// time, in seconds, after which the grenade explodes
+	double	  m_dExplosionDelay;
+
+	bool	  m_bExploded = false;
+
+	//If the grenade has impacted we test all bots to see if they are within the 
 	//blast radius and reduce their health accordingly
 	void InflictDamageOnBotsWithinBlastRadius();
 

@@ -113,20 +113,12 @@ void Trigger_WeaponGiver::Render()
       
         break;
 
-	  // TODO: Customize (Copy/pasted from type_rocket_launcher, color changed form red to purple)
 	  case type_grenade_launcher:
 	  {
-
-		  Vector2D facing(-1, 0);
-
-		  m_vecRLVBTrans = WorldTransform(m_vecRLVB,
-			  Pos(),
-			  facing,
-			  facing.Perp(),
-			  Vector2D(2.5, 2.5));
-
-		  gdi->PurplePen();
-		  gdi->ClosedShape(m_vecRLVBTrans);
+		  gdi->GreenBrush();
+		  gdi->DarkGreenPen();
+		  const double sz = 2.0;
+		  gdi->Circle(Pos().x, Pos().y, sz);
 	  }
 
 	  break;

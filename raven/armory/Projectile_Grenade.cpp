@@ -27,7 +27,8 @@ Grenade::Grenade(Raven_Bot* shooter, Vector2D target) :
 		script->GetDouble("Grenade_MaxForce")),
 
 	m_dCurrentBlastRadius(0.0),
-	m_dBlastRadius(script->GetDouble("Grenade_BlastRadius"))
+	m_dBlastRadius(script->GetDouble("Grenade_BlastRadius")),
+	m_dExplosionDelay(script->GetDouble("Grenade_ExplosionDelay"))
 {
 	assert(target != Vector2D());
 }
@@ -37,19 +38,22 @@ Grenade::Grenade(Raven_Bot* shooter, Vector2D target) :
 //-----------------------------------------------------------------------------
 void Grenade::Update()
 {
-	if (!m_bImpacted)
+	if (!m_bExploded)
 	{
-		m_vVelocity = MaxSpeed() * Heading();
+		if (!m_bImpacted) {
+			m_vVelocity = MaxSpeed() * Heading();
 
-		//make sure vehicle does not exceed maximum velocity
-		m_vVelocity.Truncate(m_dMaxSpeed);
+			//make sure vehicle does not exceed maximum velocity
+			m_vVelocity.Truncate(m_dMaxSpeed);
 
-		//update the position
-		m_vPosition += m_vVelocity;
+			//update the position
+			m_vPosition += m_vVelocity;
+		}
+	
+		m_bExploded = ((Clock->GetCurrentTime() - m_dTimeOfCreation) >= m_dExplosionDelay);
 
 		TestForImpact();
 	}
-
 	else
 	{
 		m_dCurrentBlastRadius += script->GetDouble("Grenade_ExplosionDecayRate");
@@ -80,16 +84,22 @@ void Grenade::TestForImpact()
 	{
 		m_bImpacted = true;
 
-		//send a message to the bot to let it know it's been hit, and who the
-		//shot came from
-		Dispatcher->DispatchMsg(SEND_MSG_IMMEDIATELY,
-			m_iShooterID,
-			hit->ID(),
-			Msg_TakeThatMF,
-			(void*)&m_iDamageInflicted);
+		if (m_bExploded) {
+			//send a message to the bot to let it know it's been hit, and who the
+			//shot came from
+			Dispatcher->DispatchMsg(SEND_MSG_IMMEDIATELY,
+				m_iShooterID,
+				hit->ID(),
+				Msg_TakeThatMF,
+				(void*)&m_iDamageInflicted);
 
-		//test for bots within the blast radius and inflict damage
-		InflictDamageOnBotsWithinBlastRadius();
+			//test for bots within the blast radius and inflict damage
+			InflictDamageOnBotsWithinBlastRadius();
+
+			//add a trigger to the game so that the other bots can hear this shot
+			//(provided they are within range)
+			m_pWorld->GetMap()->AddSoundTrigger(hit, script->GetDouble("Grenade_SoundRange"));
+		}
 	}
 
 	//test for impact with a wall
@@ -102,8 +112,10 @@ void Grenade::TestForImpact()
 	{
 		m_bImpacted = true;
 
-		//test for bots within the blast radius and inflict damage
-		InflictDamageOnBotsWithinBlastRadius();
+		if (m_bExploded) {
+			//test for bots within the blast radius and inflict damage
+			InflictDamageOnBotsWithinBlastRadius();
+		}
 
 		m_vPosition = m_vImpactPoint;
 
@@ -117,7 +129,9 @@ void Grenade::TestForImpact()
 	{
 		m_bImpacted = true;
 
-		InflictDamageOnBotsWithinBlastRadius();
+		if (m_bExploded) {
+			InflictDamageOnBotsWithinBlastRadius();
+		}
 	}
 }
 
@@ -152,12 +166,13 @@ void Grenade::InflictDamageOnBotsWithinBlastRadius()
 void Grenade::Render()
 {
 
-	gdi->PurplePen();
-	gdi->OrangeBrush();
+	gdi->DarkGreenPen();
+	gdi->GreenBrush();
 	gdi->Circle(Pos(), 2);
 
 	if (m_bImpacted)
 	{
+		gdi->BlackPen();
 		gdi->HollowBrush();
 		gdi->Circle(Pos(), m_dCurrentBlastRadius);
 	}

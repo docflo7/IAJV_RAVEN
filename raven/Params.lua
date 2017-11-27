@@ -151,16 +151,17 @@ Rocket_ExplosionDecayRate = 2.0   --how fast the explosion occurs (in secs)
 Grenade_FiringFreq       = 3
 Grenade_DefaultRounds      = 3
 Grenade_MaxRoundsCarried = 6
-Grenade_IdealRange  = 150
-Grenade_SoundRange  = 500
+Grenade_IdealRange  = 200
+Grenade_SoundRange  = 600
 
 Grenade_BlastRadius = 50
 Grenade_MaxSpeed    = 3
 Grenade_Mass        = 0.5
 Grenade_MaxForce    = 50.0
 Grenade_Scale       = 0.2 * Bot_Scale
-Grenade_Damage      = 20
-Grenade_ExplosionDecayRate = 3   --how fast the explosion occurs (in secs)
+Grenade_Damage      = 50
+Grenade_ExplosionDelay = 2
+Grenade_ExplosionDecayRate = 5   --how fast the explosion occurs (in secs)
 
 RailGun_FiringFreq       = 1
 RailGun_DefaultRounds      = 15
