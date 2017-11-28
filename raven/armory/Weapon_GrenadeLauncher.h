@@ -19,6 +19,7 @@ class  Raven_Bot;
 class GrenadeLauncher : public Raven_Weapon
 {
 private:
+	int	   GetHittableTargetCount();
 
 	void  InitializeFuzzyModule();
 

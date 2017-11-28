@@ -63,15 +63,46 @@ double GrenadeLauncher::GetDesirability(double DistToTarget)
 	}
 	else
 	{
-		// TODO: Maybe add the number of enemies around the target?
-		//fuzzify distance and amount of ammo
+		//fuzzify distance and hittable target count
 		m_FuzzyModule.Fuzzify("DistToTarget", DistToTarget);
-		m_FuzzyModule.Fuzzify("AmmoStatus", (double)m_iNumRoundsLeft);
+		m_FuzzyModule.Fuzzify("HittableTargetCount", GetHittableTargetCount());
 
 		m_dLastDesirabilityScore = m_FuzzyModule.DeFuzzify("Desirability", FuzzyModule::max_av);
 	}
 
 	return m_dLastDesirabilityScore;
+}
+
+// Get all bots (except the owner) that can be hit with the blast.
+int GrenadeLauncher::GetHittableTargetCount() {
+	Raven_Game *world = m_pOwner->GetWorld();
+
+	std::list<Raven_Bot*>::const_iterator curBot = world->GetAllBots().begin();
+
+	Raven_Bot *target = m_pOwner->GetTargetSys()->GetTarget();
+	int result = 1; // At least the target
+
+	// Beyond this value, we do not care how many more bots we can hit.
+	// There will be... BLOOOOOD!
+	int overkillCount = 10;
+
+	double grenadeBlastRadius = script->GetDouble("Grenade_BlastRadius");
+
+	for (curBot; curBot != world->GetAllBots().end(); ++curBot)
+	{
+		Raven_Bot *bot = *curBot;
+
+		if ((bot == m_pOwner) || (bot == target)) continue;
+
+		if (Vec2DDistance(target->Pos(), (*curBot)->Pos()) < grenadeBlastRadius + (*curBot)->BRadius())
+		{
+			++result;
+
+			if (result > overkillCount) break;
+		}
+	}
+
+	return result;
 }
 
 //-------------------------  InitializeFuzzyModule ----------------------------
@@ -80,8 +111,6 @@ double GrenadeLauncher::GetDesirability(double DistToTarget)
 //-----------------------------------------------------------------------------
 void GrenadeLauncher::InitializeFuzzyModule()
 {
-	// TODO: Change this values.
-	// Use sets of another weapon so there are less rules to write.
 	FuzzyVariable& DistToTarget = m_FuzzyModule.CreateFLV("DistToTarget");
 
 	FzSet& Target_VeryClose = DistToTarget.AddLeftShoulderSet("Target_VeryClose", 0, 10, 25);
@@ -100,44 +129,45 @@ void GrenadeLauncher::InitializeFuzzyModule()
 	FzSet& Undesirable = Desirability.AddLeftShoulderSet("Undesirable", 0, 20, 35);
 
 
-	FuzzyVariable& AmmoStatus = m_FuzzyModule.CreateFLV("AmmoStatus");
+	FuzzyVariable& HittableTargetCount = m_FuzzyModule.CreateFLV("HittableTargetCount");
 
-	FzSet& Ammo_Loads = AmmoStatus.AddRightShoulderSet("Ammo_Loads", 50, 80, 100);
-	FzSet& Ammo_Plenty = AmmoStatus.AddTriangularSet("Ammo_Plenty", 15, 50, 80);
-	FzSet& Ammo_Okay = AmmoStatus.AddTriangularSet("Ammo_Okay", 5, 15, 50);
-	FzSet& Ammo_Low = AmmoStatus.AddTriangularSet("Ammo_Low", 0, 5, 15);
-	FzSet& Ammo_NearlyOut = AmmoStatus.AddTriangularSet("Ammo_NearlyOut", 0, 0, 5);
+	// TODO/FIXME: This should (maybe) use a ratio. 
+	FzSet& Hit_Lots = HittableTargetCount.AddRightShoulderSet("Hit_Lots", 4, 5, 10);
+	FzSet& Hit_Many = HittableTargetCount.AddTriangularSet("Hit_Many", 3, 4, 5);
+	FzSet& Hit_Some = HittableTargetCount.AddTriangularSet("Hit_Some", 2, 3, 4);
+	FzSet& Hit_Few = HittableTargetCount.AddTriangularSet("Hit_Few", 1, 2, 3);
+	FzSet& Hit_OneOrTwo = HittableTargetCount.AddTriangularSet("Hit_One", 0, 1, 2);
 
 
-	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Ammo_Loads), Undesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Ammo_Plenty), Undesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Ammo_Okay), Undesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Ammo_Low), Undesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Ammo_NearlyOut), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_Lots), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_Many), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_Some), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_Few), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_OneOrTwo), Undesirable);
 
-	m_FuzzyModule.AddRule(FzAND(Target_Close, Ammo_Loads), Undesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Close, Ammo_Plenty), Undesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Close, Ammo_Okay), Undesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Close, Ammo_Low), Undesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Close, Ammo_NearlyOut), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Close, Hit_Lots), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Close, Hit_Many), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Close, Hit_Some), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Close, Hit_Few), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Close, Hit_OneOrTwo), Undesirable);
 
-	m_FuzzyModule.AddRule(FzAND(Target_Medium, Ammo_Loads), VeryDesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Medium, Ammo_Plenty), VeryDesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Medium, Ammo_Okay), VeryDesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Medium, Ammo_Low), QuiteDesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Medium, Ammo_NearlyOut), Desirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Medium, Hit_Lots), QuiteDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Medium, Hit_Many), QuiteDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Medium, Hit_Some), Desirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Medium, Hit_Few), SomewhatDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Medium, Hit_OneOrTwo), Undesirable);
 
-	m_FuzzyModule.AddRule(FzAND(Target_Far, Ammo_Loads), Desirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Far, Ammo_Plenty), Desirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Far, Ammo_Okay), SomewhatDesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Far, Ammo_Low), SomewhatDesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Far, Ammo_NearlyOut), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Far, Hit_Lots), VeryDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Far, Hit_Many), VeryDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Far, Hit_Some), QuiteDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Far, Hit_Few), Desirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Far, Hit_OneOrTwo), Undesirable);
 
-	m_FuzzyModule.AddRule(FzAND(Target_FarAway, Ammo_Loads), SomewhatDesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_FarAway, Ammo_Plenty), SomewhatDesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_FarAway, Ammo_Okay), SomewhatDesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_FarAway, Ammo_Low), Undesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_FarAway, Ammo_NearlyOut), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_FarAway, Hit_Lots), QuiteDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_FarAway, Hit_Many), QuiteDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_FarAway, Hit_Some), QuiteDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_FarAway, Hit_Few), SomewhatDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_FarAway, Hit_OneOrTwo), Undesirable);
 }
 
 
