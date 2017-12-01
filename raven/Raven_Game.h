@@ -100,6 +100,10 @@ public:
   void AddBolt(Raven_Bot* shooter, Vector2D target);
   void AddGrenade(Raven_Bot* shooter, Vector2D target);
 
+  void AddPlayer();
+  //Remove every Mouse's action in querie
+  void StopAction();
+
   //removes the last bot to be added
   void RemoveBot();
 
@@ -151,6 +155,7 @@ public:
   //if a bot is possessed the keyboard is polled for user input and any 
   //relevant bot methods are called appropriately
   void        GetPlayerInput()const;
+  void		  ChangePlayerVelocity();
   Raven_Bot*  PossessedBot()const{return m_pSelectedBot;}
   void        ChangeWeaponOfPossessedBot(unsigned int weapon)const;
 

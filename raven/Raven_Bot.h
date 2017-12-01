@@ -173,6 +173,7 @@ public:
   void          FireWeapon(Vector2D pos);
   void          ChangeWeapon(unsigned int type);
   void          TakePossession();
+  void          ForcePossession();
   void          Exorcise();
 
   //spawns the bot at the given position
