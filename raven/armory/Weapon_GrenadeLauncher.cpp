@@ -77,8 +77,6 @@ double GrenadeLauncher::GetDesirability(double DistToTarget)
 int GrenadeLauncher::GetHittableTargetCount() {
 	Raven_Game *world = m_pOwner->GetWorld();
 
-	std::list<Raven_Bot*>::const_iterator curBot = world->GetAllBots().begin();
-
 	Raven_Bot *target = m_pOwner->GetTargetSys()->GetTarget();
 	int result = 1; // At least the target
 
@@ -88,6 +86,7 @@ int GrenadeLauncher::GetHittableTargetCount() {
 
 	double grenadeBlastRadius = script->GetDouble("Grenade_BlastRadius");
 
+	std::list<Raven_Bot*>::const_iterator curBot = world->GetAllBots().begin();
 	for (curBot; curBot != world->GetAllBots().end(); ++curBot)
 	{
 		Raven_Bot *bot = *curBot;
@@ -136,7 +135,7 @@ void GrenadeLauncher::InitializeFuzzyModule()
 	FzSet& Hit_Many = HittableTargetCount.AddTriangularSet("Hit_Many", 3, 4, 5);
 	FzSet& Hit_Some = HittableTargetCount.AddTriangularSet("Hit_Some", 2, 3, 4);
 	FzSet& Hit_Few = HittableTargetCount.AddTriangularSet("Hit_Few", 1, 2, 3);
-	FzSet& Hit_OneOrTwo = HittableTargetCount.AddTriangularSet("Hit_One", 0, 1, 2);
+	FzSet& Hit_OneOrTwo = HittableTargetCount.AddTriangularSet("Hit_OneOrTwo", 0, 1, 2);
 
 
 	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_Lots), Undesirable);
