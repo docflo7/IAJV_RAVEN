@@ -334,9 +334,14 @@ void Raven_WeaponSystem::AddNoiseToAim(Vector2D& AimingPos)
   m_FuzzyModule.Fuzzify("SpeedRatio", (int) (100 * (m_pOwner->Speed() / m_pOwner->MaxSpeed())));
   m_FuzzyModule.Fuzzify("TimeTargetVisible", m_pOwner->GetTargetSys()->GetTimeTargetHasBeenVisible());
 
-  double aimNoiseMagnitude = m_FuzzyModule.DeFuzzify("AimNoise", FuzzyModule::max_av) / 100.0;
+  double aimNoiseBias = m_FuzzyModule.DeFuzzify("AimNoise", FuzzyModule::max_av) / 100.0;
+  int sign = RandBool() * 2 - 1;
 
-  Vec2DRotateAroundOrigin(toPos, aimNoiseMagnitude * RandInRange(-m_dAimAccuracy, m_dAimAccuracy));
+  // NOTE: m_dAimAccurary is always 0 anyway...
+  // I use RandGaussian because, why not?
+  double noise = sign * (m_dAimAccuracy + aimNoiseBias * RandGaussian(1, 0.2));
+
+  Vec2DRotateAroundOrigin(toPos, noise);
 
   AimingPos = toPos + m_pOwner->Pos();
 }
