@@ -161,7 +161,7 @@ Grenade_MaxForce    = 50.0
 Grenade_Scale       = 0.2 * Bot_Scale
 Grenade_Damage      = 50
 Grenade_ExplosionDelay = 2
-Grenade_ExplosionDecayRate = 5   --how fast the explosion occurs (in secs)
+Grenade_ExplosionDecayRate = 10.0   --how fast the explosion occurs (in secs)
 
 RailGun_FiringFreq       = 1
 RailGun_DefaultRounds      = 15

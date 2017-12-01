@@ -130,7 +130,6 @@ void GrenadeLauncher::InitializeFuzzyModule()
 
 	FuzzyVariable& HittableTargetCount = m_FuzzyModule.CreateFLV("HittableTargetCount");
 
-	// TODO/FIXME: This should (maybe) use a ratio. 
 	FzSet& Hit_Lots = HittableTargetCount.AddRightShoulderSet("Hit_Lots", 4, 5, 10);
 	FzSet& Hit_Many = HittableTargetCount.AddTriangularSet("Hit_Many", 3, 4, 5);
 	FzSet& Hit_Some = HittableTargetCount.AddTriangularSet("Hit_Some", 2, 3, 4);
@@ -138,19 +137,19 @@ void GrenadeLauncher::InitializeFuzzyModule()
 	FzSet& Hit_OneOrTwo = HittableTargetCount.AddTriangularSet("Hit_OneOrTwo", 0, 1, 2);
 
 
-	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_Lots), Undesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_Many), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_Lots), VeryDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_Many), SomewhatDesirable);
 	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_Some), Undesirable);
 	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_Few), Undesirable);
 	m_FuzzyModule.AddRule(FzAND(Target_VeryClose, Hit_OneOrTwo), Undesirable);
 
-	m_FuzzyModule.AddRule(FzAND(Target_Close, Hit_Lots), Undesirable);
-	m_FuzzyModule.AddRule(FzAND(Target_Close, Hit_Many), Undesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Close, Hit_Lots), VeryDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Close, Hit_Many), SomewhatDesirable);
 	m_FuzzyModule.AddRule(FzAND(Target_Close, Hit_Some), Undesirable);
 	m_FuzzyModule.AddRule(FzAND(Target_Close, Hit_Few), Undesirable);
 	m_FuzzyModule.AddRule(FzAND(Target_Close, Hit_OneOrTwo), Undesirable);
 
-	m_FuzzyModule.AddRule(FzAND(Target_Medium, Hit_Lots), QuiteDesirable);
+	m_FuzzyModule.AddRule(FzAND(Target_Medium, Hit_Lots), VeryDesirable);
 	m_FuzzyModule.AddRule(FzAND(Target_Medium, Hit_Many), QuiteDesirable);
 	m_FuzzyModule.AddRule(FzAND(Target_Medium, Hit_Some), Desirable);
 	m_FuzzyModule.AddRule(FzAND(Target_Medium, Hit_Few), SomewhatDesirable);
