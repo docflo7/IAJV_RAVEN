@@ -52,7 +52,17 @@ void Grenade::Update()
 	
 		m_bExploded = ((Clock->GetCurrentTime() - m_dTimeOfCreation) >= m_dExplosionDelay);
 
-		TestForImpact();
+		if (m_bExploded) {
+			//test for bots within the blast radius and inflict damage
+			InflictDamageOnBotsWithinBlastRadius();
+
+			// NOTE: It would make sense to add a sound trigger (it's a grenade after all),
+			// but its main use is for other bots to register the position of the bot making the noise.
+			// Which is completely irrelevant here.
+		}
+		else {
+			TestForImpact();
+		}
 	}
 	else
 	{
@@ -83,23 +93,6 @@ void Grenade::TestForImpact()
 	if (hit)
 	{
 		m_bImpacted = true;
-
-		if (m_bExploded) {
-			//send a message to the bot to let it know it's been hit, and who the
-			//shot came from
-			Dispatcher->DispatchMsg(SEND_MSG_IMMEDIATELY,
-				m_iShooterID,
-				hit->ID(),
-				Msg_TakeThatMF,
-				(void*)&m_iDamageInflicted);
-
-			//test for bots within the blast radius and inflict damage
-			InflictDamageOnBotsWithinBlastRadius();
-
-			//add a trigger to the game so that the other bots can hear this shot
-			//(provided they are within range)
-			m_pWorld->GetMap()->AddSoundTrigger(hit, script->GetDouble("Grenade_SoundRange"));
-		}
 	}
 
 	//test for impact with a wall
@@ -112,11 +105,6 @@ void Grenade::TestForImpact()
 	{
 		m_bImpacted = true;
 
-		if (m_bExploded) {
-			//test for bots within the blast radius and inflict damage
-			InflictDamageOnBotsWithinBlastRadius();
-		}
-
 		m_vPosition = m_vImpactPoint;
 
 		return;
@@ -128,10 +116,6 @@ void Grenade::TestForImpact()
 	if (Vec2DDistanceSq(Pos(), m_vTarget) < tolerance*tolerance)
 	{
 		m_bImpacted = true;
-
-		if (m_bExploded) {
-			InflictDamageOnBotsWithinBlastRadius();
-		}
 	}
 }
 
@@ -146,7 +130,10 @@ void Grenade::InflictDamageOnBotsWithinBlastRadius()
 
 	for (curBot; curBot != m_pWorld->GetAllBots().end(); ++curBot)
 	{
-		if (Vec2DDistance(Pos(), (*curBot)->Pos()) < m_dBlastRadius + (*curBot)->BRadius())
+		double blast = m_dBlastRadius + (*curBot)->BRadius();
+		double botDistSq = Vec2DDistanceSq(Pos(), (*curBot)->Pos());
+
+		if (botDistSq < (blast * blast))
 		{
 			//send a message to the bot to let it know it's been hit, and who the
 			//shot came from
@@ -155,7 +142,6 @@ void Grenade::InflictDamageOnBotsWithinBlastRadius()
 				(*curBot)->ID(),
 				Msg_TakeThatMF,
 				(void*)&m_iDamageInflicted);
-
 		}
 	}
 }
