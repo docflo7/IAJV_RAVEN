@@ -274,6 +274,15 @@
     <ClCompile Include="armory\Weapon_GrenadeLauncher.cpp">
       <Filter>Game\weapons &amp; projectiles\weapons</Filter>
     </ClCompile>
+    <ClCompile Include="NeuralNetwork.cpp">
+      <Filter>Game\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuralNetworkTrainer.cpp">
+      <Filter>Game\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="TrainingDataReader.cpp">
+      <Filter>Game\misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Raven_Bot.h">
@@ -617,6 +626,15 @@
     </ClInclude>
     <ClInclude Include="armory\Weapon_GrenadeLauncher.h">
       <Filter>Game\weapons &amp; projectiles\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNetwork.h">
+      <Filter>Game\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNetworkTrainer.h">
+      <Filter>Game\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="TrainingDataReader.h">
+      <Filter>Game\misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

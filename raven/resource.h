@@ -28,6 +28,7 @@
 #define IDM_GAME_ADDPLAYER				40021
 #define IDM_GAME_MOUSE					40022
 #define IDM_GAME_KEYBOARD				40023
+#define IDM_NEURAL_ADD					40024
 
 // Next default values for new objects
 // 

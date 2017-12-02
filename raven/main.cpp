@@ -384,6 +384,10 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 
         break;
 
+	  case IDM_NEURAL_ADD:
+		  g_pRaven->AddNeuralBot();
+		  break;
+
       }//end switch
     }
 
