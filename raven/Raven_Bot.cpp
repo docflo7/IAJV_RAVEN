@@ -79,7 +79,7 @@ Raven_Bot::Raven_Bot(Raven_Game* world, Vector2D pos, bool bNeural) :
   m_pTargetSelectionRegulator = new Regulator(script->GetDouble("Bot_TargetingUpdateFreq"));
   m_pTriggerTestRegulator = new Regulator(script->GetDouble("Bot_TriggerUpdateFreq"));
   m_pVisionUpdateRegulator = new Regulator(script->GetDouble("Bot_VisionUpdateFreq"));
-  m_pDatasetWriteRegulator = new Regulator(2); //save data twice per seconds
+  m_pDatasetWriteRegulator = new Regulator(25); //save data twice per seconds
   //create the goal queue
   m_pBrain = new Goal_Think(this);
 
@@ -99,7 +99,7 @@ Raven_Bot::Raven_Bot(Raven_Game* world, Vector2D pos, bool bNeural) :
 	  m_nNetwork = new BPN::Network(networkSettings);
 
 	  BPN::TrainingDataReader dataReader("dataset.data", 2, 1);
-
+	  dataReader.ReadData();
 	  BPN::NetworkTrainer::Settings trainerSettings;
 	  trainerSettings.m_learningRate = 0.001;
 	  trainerSettings.m_momentum = 0.9;
@@ -201,7 +201,8 @@ void Raven_Bot::Update()
 			Raven_Weapon* currWeapon = this->GetWeaponSys()->GetCurrentWeapon();
 			double weaponType = currWeapon->GetType();
 			double weaponAmmo = this->GetWeaponSys()->GetAmmoRemainingForWeapon(weaponType);
-			if (m_nNetwork->Evaluate({ weaponType,weaponAmmo }) == std::vector<int32_t>{1})
+			debug_con << "Evalutate = " << m_nNetwork->Evaluate({ weaponType,weaponAmmo }).at(0) << "\n";
+			if (m_nNetwork->Evaluate({ weaponType,weaponAmmo }) == std::vector<int32_t>{-1})
 			{
 				m_pWeaponSys->TakeAimAndShoot();
 			}

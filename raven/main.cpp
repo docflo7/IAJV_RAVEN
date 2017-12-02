@@ -256,10 +256,7 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 	  case IDM_GAME_KEYBOARD:
 		  
 		  UserOptions->m_bMouse = false;
-		  if (UserOptions->m_bPlayer)
-		  {
-			  g_pRaven->StopAction();
-		  }
+		  g_pRaven->StopAction();
 		  ChangeMenuState(hwnd, IDM_GAME_KEYBOARD, MFS_CHECKED);
 		  ChangeMenuState(hwnd, IDM_GAME_MOUSE, MFS_UNCHECKED);
 

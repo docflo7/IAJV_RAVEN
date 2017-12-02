@@ -53,7 +53,7 @@ namespace BPN
                     // Read values
                     int i = 0;
                     char* nextToken = nullptr;
-                    char* pToken = strtok_s( cstr, ",", &nextToken );
+                    char* pToken = strtok_s( cstr, " ", &nextToken );
 
                     while ( pToken != nullptr && i < totalValuesToRead )
                     {
@@ -67,7 +67,7 @@ namespace BPN
                             entry.m_expectedOutputs.push_back( (int32_t) outputValue );
                         }
 
-                        pToken = strtok_s( nullptr, ",", &nextToken );
+                        pToken = strtok_s( nullptr, " ", &nextToken );
                         i++;
                     }
                 }
