@@ -357,6 +357,16 @@ void Raven_Bot::TakePossession()
     debug_con << "Player Possesses bot " << this->ID() << "";
   }
 }
+
+void Raven_Bot::ForcePossession()
+{
+
+	m_bPossessed = true;
+
+	debug_con << "Player Possesses bot " << this->ID() << "";
+
+}
+
 //------------------------------- Exorcise ------------------------------------
 //
 //  called when a human is exorcised from this bot and the AI takes control

@@ -113,6 +113,16 @@ void Trigger_WeaponGiver::Render()
       
         break;
 
+	  case type_grenade_launcher:
+	  {
+		  gdi->GreenBrush();
+		  gdi->DarkGreenPen();
+		  const double sz = 2.0;
+		  gdi->Circle(Pos().x, Pos().y, sz);
+	  }
+
+	  break;
+
     }//end switch
   }
 }

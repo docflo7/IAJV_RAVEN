@@ -26,7 +26,14 @@ private:
 public:
 
   static Raven_UserOptions* Instance();
-  
+  bool m_bWaitForUpdate;
+
+  bool m_bMouse;
+
+  bool m_bPlayer;
+
+  bool m_bAzerty;
+
   bool m_bShowGraph;
 
   bool m_bShowNodeIndices;

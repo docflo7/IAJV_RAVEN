@@ -23,6 +23,11 @@
 #define IDM_NAVIGATION_SMOOTH_PATHS_PRECISE 40015
 #define IDM_BOTS_SHOW_SENSED            40016
 #define IDM_GAME_PAUSE                  40017
+#define IDM_GAME_AZERTY					40019
+#define IDM_GAME_QWERTY					40020
+#define IDM_GAME_ADDPLAYER				40021
+#define IDM_GAME_MOUSE					40022
+#define IDM_GAME_KEYBOARD				40023
 
 // Next default values for new objects
 // 
