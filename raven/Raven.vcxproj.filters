@@ -26,9 +26,6 @@
     <Filter Include="Game\Script related\lua headers">
       <UniqueIdentifier>{7a7cdb20-9c53-48f6-b5f5-3da6359bcbc1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\misc">
-      <UniqueIdentifier>{ce3a2a8a-9260-492f-81ad-1c276291884d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{dee236fe-e435-493e-98ba-3e69d8b817f6}</UniqueIdentifier>
     </Filter>
@@ -76,6 +73,9 @@
     </Filter>
     <Filter Include="Common">
       <UniqueIdentifier>{f3f5ab42-49d8-4348-aa63-66655abd9be1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\misc">
+      <UniqueIdentifier>{ce3a2a8a-9260-492f-81ad-1c276291884d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -273,6 +273,21 @@
     </ClCompile>
     <ClCompile Include="Goal_FleeProjectile.cpp">
       <Filter>AI\goals\composite</Filter>
+    </ClCompile>
+    <ClCompile Include="armory\Weapon_GrenadeLauncher.cpp">
+      <Filter>Game\weapons &amp; projectiles\weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="armory\Projectile_Grenade.cpp">
+      <Filter>Game\weapons &amp; projectiles\projectiles</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuralNetwork.cpp">
+      <Filter>Game\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuralNetworkTrainer.cpp">
+      <Filter>Game\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="TrainingDataReader.cpp">
+      <Filter>Game\misc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -617,6 +632,21 @@
     </ClInclude>
     <ClInclude Include="Goal_FleeProjectile.h">
       <Filter>AI\goals\composite</Filter>
+    </ClInclude>
+    <ClInclude Include="armory\Weapon_GrenadeLauncher.h">
+      <Filter>Game\weapons &amp; projectiles\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="armory\Projectile_Grenade.h">
+      <Filter>Game\weapons &amp; projectiles\projectiles</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNetwork.h">
+      <Filter>Game\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNetworkTrainer.h">
+      <Filter>Game\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="TrainingDataReader.h">
+      <Filter>Game\misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
