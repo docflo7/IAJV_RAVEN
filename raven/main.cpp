@@ -98,6 +98,10 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
          g_pRaven = new Raven_Game();
 
         //make sure the menu items are ticked/unticked accordingly
+		 CheckMenuItemAppropriately(hwnd, IDM_GAME_MOUSE, UserOptions->m_bMouse);
+		 CheckMenuItemAppropriately(hwnd, IDM_GAME_KEYBOARD, !UserOptions->m_bMouse);
+		 CheckMenuItemAppropriately(hwnd, IDM_GAME_AZERTY, UserOptions->m_bAzerty);
+		 CheckMenuItemAppropriately(hwnd, IDM_GAME_QWERTY, !UserOptions->m_bAzerty);
         CheckMenuItemAppropriately(hwnd, IDM_NAVIGATION_SHOW_NAVGRAPH, UserOptions->m_bShowGraph);
         CheckMenuItemAppropriately(hwnd, IDM_NAVIGATION_SHOW_PATH, UserOptions->m_bShowPathOfSelectedBot);
         CheckMenuItemAppropriately(hwnd, IDM_BOTS_SHOW_IDS, UserOptions->m_bShowBotIDs);
@@ -156,9 +160,17 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 
            break;
 
+		 case '5':
+
+		  g_pRaven->ChangeWeaponOfPossessedBot(type_grenade_launcher);
+
+		  break;
+
          case 'X':
 
            g_pRaven->ExorciseAnyPossessedBot();
+		   UserOptions->m_bPlayer = false;
+		   ChangeMenuState(hwnd, IDM_GAME_ADDPLAYER, MFS_ENABLED);
 
            break;
 
@@ -169,8 +181,9 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
 
          case VK_DOWN:
 
-           g_pRaven->RemoveBot(); break;
-           
+           g_pRaven->RemoveBot(); 
+		   UserOptions->m_bWaitForUpdate = true;
+		   break;
 
         }
       }
@@ -188,6 +201,8 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
    case WM_RBUTTONDOWN:
     {
       g_pRaven->ClickRightMouseButton(MAKEPOINTS(lParam));
+	  if (UserOptions->m_bPlayer) { ChangeMenuState(hwnd, IDM_GAME_ADDPLAYER, MFS_DISABLED); }
+	  else { ChangeMenuState(hwnd, IDM_GAME_ADDPLAYER, MFS_ENABLED); }
     }
     
     break;
@@ -221,8 +236,46 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
       case IDM_GAME_REMOVEBOT:
           
           g_pRaven->RemoveBot();
+		  UserOptions->m_bWaitForUpdate = true;
 
           break;
+
+	  case IDM_GAME_ADDPLAYER:
+		  g_pRaven->AddPlayer();
+		  UserOptions->m_bPlayer = true;
+		  ChangeMenuState(hwnd, IDM_GAME_ADDPLAYER, MFS_DISABLED);
+		  break;
+
+	  case IDM_GAME_MOUSE:
+		  
+		  UserOptions->m_bMouse = true;
+		  ChangeMenuState(hwnd, IDM_GAME_MOUSE, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDM_GAME_KEYBOARD, MFS_UNCHECKED);
+		  
+		  break;
+	  case IDM_GAME_KEYBOARD:
+		  
+		  UserOptions->m_bMouse = false;
+		  g_pRaven->StopAction();
+		  ChangeMenuState(hwnd, IDM_GAME_KEYBOARD, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDM_GAME_MOUSE, MFS_UNCHECKED);
+
+		  break;
+	  case IDM_GAME_AZERTY:
+		  
+		  UserOptions->m_bAzerty = true;
+		  ChangeMenuState(hwnd, IDM_GAME_AZERTY, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDM_GAME_QWERTY, MFS_UNCHECKED);
+		  
+		  break;
+
+	  case IDM_GAME_QWERTY:
+		  
+		  UserOptions->m_bAzerty = false;
+		  ChangeMenuState(hwnd, IDM_GAME_QWERTY, MFS_CHECKED);
+		  ChangeMenuState(hwnd, IDM_GAME_AZERTY, MFS_UNCHECKED);
+		  
+		  break;
 
       case IDM_GAME_PAUSE:
           
@@ -330,6 +383,10 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
         CheckMenuItemAppropriately(hwnd, IDM_BOTS_SHOW_GOAL_Q, UserOptions->m_bShowGoalsOfSelectedBot);
 
         break;
+
+	  case IDM_NEURAL_ADD:
+		  g_pRaven->AddNeuralBot();
+		  break;
 
       }//end switch
     }
@@ -523,7 +580,15 @@ int WINAPI WinMain (HINSTANCE hInstance,
       if (timer.ReadyForNextFrame() && msg.message != WM_QUIT)
       {
         g_pRaven->Update();
-        
+		if (UserOptions->m_bWaitForUpdate)
+		{
+			if (!UserOptions->m_bPlayer)
+			{
+				ChangeMenuState(hWnd, IDM_GAME_ADDPLAYER, MFS_ENABLED);
+
+			}
+			UserOptions->m_bWaitForUpdate = false;
+		}
         //render 
         RedrawWindow(hWnd);
       }

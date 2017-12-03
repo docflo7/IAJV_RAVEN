@@ -16,7 +16,7 @@
 #include "game/MovingEntity.h"
 #include "misc/utils.h"
 #include "Raven_TargetingSystem.h"
-
+#include "NeuralNetwork.h"
 
 class Raven_PathPlanner;
 class Raven_Steering;
@@ -73,7 +73,7 @@ private:
   Regulator*                         m_pTargetSelectionRegulator;
   Regulator*                         m_pTriggerTestRegulator;
   Regulator*                         m_pVisionUpdateRegulator;
-
+  Regulator*                         m_pDatasetWriteRegulator;
   //the bot's health. Every time the bot is shot this value is decreased. If
   //it reaches zero then the bot dies (and respawns)
   int                                m_iHealth;
@@ -104,12 +104,16 @@ private:
 
   //set to true when a human player takes over control of the bot
   bool                               m_bPossessed;
-
+  bool								 m_bNeural;
+  bool								 m_bRecording;
+  bool								 m_bTir;
   //a vertex buffer containing the bot's geometry
   std::vector<Vector2D>              m_vecBotVB;
   //the buffer for the transformed vertices
   std::vector<Vector2D>              m_vecBotVBTrans;
 
+
+  BPN::Network* m_nNetwork;
 
   //bots shouldn't be copied, only created or respawned
   Raven_Bot(const Raven_Bot&);
@@ -125,7 +129,7 @@ private:
 
 public:
   
-  Raven_Bot(Raven_Game* world, Vector2D pos);
+  Raven_Bot(Raven_Game* world, Vector2D pos, bool Neural = false);
   virtual ~Raven_Bot();
 
   //the usual suspects
@@ -173,6 +177,7 @@ public:
   void          FireWeapon(Vector2D pos);
   void          ChangeWeapon(unsigned int type);
   void          TakePossession();
+  void          ForcePossession();
   void          Exorcise();
 
   //spawns the bot at the given position
@@ -199,7 +204,11 @@ public:
   bool          canStepForward(Vector2D& PositionOfStep)const;
   bool          canStepBackward(Vector2D& PositionOfStep)const;
 
-  
+
+  //Write data
+  void			WriteDataSet(int tir = 0);
+  bool			isRecording(void) { return m_bRecording; }
+
   Raven_Game* const                  GetWorld(){return m_pWorld;} 
   Raven_Steering* const              GetSteering(){return m_pSteering;}
   Raven_PathPlanner* const           GetPathPlanner(){return m_pPathPlanner;}

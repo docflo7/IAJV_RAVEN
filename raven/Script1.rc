@@ -34,6 +34,11 @@ BEGIN
         MENUITEM "Add Bot [ csr up ]",          IDM_GAME_ADDBOT
         MENUITEM "Remove Bot [ csr down ]",     IDM_GAME_REMOVEBOT
         MENUITEM "Toggle Pause [ 'P' ]",        IDM_GAME_PAUSE
+	MENUITEM "ADD Player", IDM_GAME_ADDPLAYER
+	MENUITEM "Mouse Controls", IDM_GAME_MOUSE
+	MENUITEM "Keyboard Controls", IDM_GAME_KEYBOARD
+	MENUITEM "AZERTY Keyboard", IDM_GAME_AZERTY
+	MENUITEM "QWERTY Keyboard", IDM_GAME_QWERTY
     END
     POPUP "Navigation"
     BEGIN
@@ -59,6 +64,10 @@ BEGIN
         MENUITEM "Show Goal Queue",             IDM_BOTS_SHOW_GOAL_Q
         MENUITEM "Show Path",                   IDM_NAVIGATION_SHOW_PATH
     END
+	POPUP "Neural Network"
+	BEGIN
+		MENUITEM "Add Neural Bot",				IDM_NEURAL_ADD
+	END
 END
 
 

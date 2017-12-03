@@ -1,4 +1,5 @@
 #include "Raven_WeaponSystem.h"
+#include "armory/Weapon_GrenadeLauncher.h"
 #include "armory/Weapon_RocketLauncher.h"
 #include "armory/Weapon_RailGun.h"
 #include "armory/Weapon_ShotGun.h"
@@ -58,6 +59,7 @@ void Raven_WeaponSystem::Initialize()
   m_WeaponMap[type_shotgun]         = 0;
   m_WeaponMap[type_rail_gun]        = 0;
   m_WeaponMap[type_rocket_launcher] = 0;
+  m_WeaponMap[type_grenade_launcher] = 0;
 }
 
 //-------------------------  InitializeFuzzyAimingModule ----------------------------
@@ -207,6 +209,10 @@ void  Raven_WeaponSystem::AddWeapon(unsigned int weapon_type)
 
     w = new RocketLauncher(m_pOwner); break;
 
+  case type_grenade_launcher:
+
+	  w = new GrenadeLauncher(m_pOwner); break;
+
   }//end switch
   
 
@@ -269,7 +275,8 @@ void Raven_WeaponSystem::TakeAimAndShoot()
     //must be adjusted to take into account the predicted movement of the 
     //target
     if (GetCurrentWeapon()->GetType() == type_rocket_launcher ||
-        GetCurrentWeapon()->GetType() == type_blaster)
+        GetCurrentWeapon()->GetType() == type_blaster ||
+		GetCurrentWeapon()->GetType() == type_grenade_launcher)
     {
       AimingPos = PredictFuturePositionOfTarget();
 
@@ -323,12 +330,21 @@ void Raven_WeaponSystem::AddNoiseToAim(Vector2D& AimingPos)
 
   //fuzzify distance, speed and target visible time
   m_FuzzyModule.Fuzzify("DistToTarget", toPos.Length());
-  m_FuzzyModule.Fuzzify("SpeedRatio", 100.0 * (m_pOwner->Speed() / m_pOwner->MaxSpeed()));
+  // Makes sure the ratio is never > 100
+  double ratio = m_pOwner->Speed() / m_pOwner->MaxSpeed();
+  Clamp(ratio, 0, 1);
+
+  m_FuzzyModule.Fuzzify("SpeedRatio", 100 * ratio);
   m_FuzzyModule.Fuzzify("TimeTargetVisible", m_pOwner->GetTargetSys()->GetTimeTargetHasBeenVisible());
 
-  double aimNoiseMagnitude = m_FuzzyModule.DeFuzzify("AimNoise", FuzzyModule::max_av) / 100.0;
+  double aimNoiseBias = m_FuzzyModule.DeFuzzify("AimNoise", FuzzyModule::max_av) / 100.0;
+  int sign = RandBool() * 2 - 1;
 
-  Vec2DRotateAroundOrigin(toPos, aimNoiseMagnitude * RandInRange(-m_dAimAccuracy, m_dAimAccuracy));
+  // NOTE: m_dAimAccurary is always 0 anyway...
+  // I use RandGaussian because, why not?
+  double noise = sign * (m_dAimAccuracy + aimNoiseBias * RandGaussian(1, 0.2));
+
+  Vec2DRotateAroundOrigin(toPos, noise);
 
   AimingPos = toPos + m_pOwner->Pos();
 }
