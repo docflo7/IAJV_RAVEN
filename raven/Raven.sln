@@ -1,11 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-<<<<<<< HEAD
 VisualStudioVersion = 15.0.26730.16
-=======
-VisualStudioVersion = 15.0.27004.2008
->>>>>>> origin/fuzzy_aim
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Raven", "Raven.vcxproj", "{EC1EBBC4-4F57-4002-856A-5C1BCFBC7BF9}"
 EndProject
@@ -17,11 +13,6 @@ Global
 		Debug|x64 = Debug|x64
 		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
-<<<<<<< HEAD
-=======
-		x64|Win32 = x64|Win32
-		x64|x64 = x64|x64
->>>>>>> origin/fuzzy_aim
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{EC1EBBC4-4F57-4002-856A-5C1BCFBC7BF9}.boundschecker|Win32.ActiveCfg = boundschecker|Win32
@@ -36,22 +27,11 @@ Global
 		{EC1EBBC4-4F57-4002-856A-5C1BCFBC7BF9}.Release|Win32.Build.0 = Release|Win32
 		{EC1EBBC4-4F57-4002-856A-5C1BCFBC7BF9}.Release|x64.ActiveCfg = Release|x64
 		{EC1EBBC4-4F57-4002-856A-5C1BCFBC7BF9}.Release|x64.Build.0 = Release|x64
-<<<<<<< HEAD
-=======
-		{EC1EBBC4-4F57-4002-856A-5C1BCFBC7BF9}.x64|Win32.ActiveCfg = Release|Win32
-		{EC1EBBC4-4F57-4002-856A-5C1BCFBC7BF9}.x64|Win32.Build.0 = Release|Win32
-		{EC1EBBC4-4F57-4002-856A-5C1BCFBC7BF9}.x64|x64.ActiveCfg = Release|x64
-		{EC1EBBC4-4F57-4002-856A-5C1BCFBC7BF9}.x64|x64.Build.0 = Release|x64
->>>>>>> origin/fuzzy_aim
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-<<<<<<< HEAD
 		SolutionGuid = {F320A3FB-B8DE-4AE7-AB1E-385190AE1479}
-=======
-		SolutionGuid = {B3CA4E40-B29E-4F41-8A03-D6FEB275526A}
->>>>>>> origin/fuzzy_aim
 	EndGlobalSection
 EndGlobal

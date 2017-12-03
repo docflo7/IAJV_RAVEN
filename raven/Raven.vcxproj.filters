@@ -268,19 +268,11 @@
     <ClCompile Include="..\Common\misc\WindowUtils.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-<<<<<<< HEAD
     <ClCompile Include="Goal_SeekItem.cpp">
       <Filter>AI\goals\composite</Filter>
     </ClCompile>
     <ClCompile Include="Goal_FleeProjectile.cpp">
       <Filter>AI\goals\composite</Filter>
-=======
-    <ClCompile Include="armory\Projectile_Grenade.cpp">
-      <Filter>Game\weapons &amp; projectiles\projectiles</Filter>
-    </ClCompile>
-    <ClCompile Include="armory\Weapon_GrenadeLauncher.cpp">
-      <Filter>Game\weapons &amp; projectiles\weapons</Filter>
->>>>>>> origin/fuzzy_aim
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -620,19 +612,11 @@
     <ClInclude Include="..\Common\misc\WindowUtils.h">
       <Filter>Common</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="Goal_SeekItem.h">
       <Filter>AI\goals\composite</Filter>
     </ClInclude>
     <ClInclude Include="Goal_FleeProjectile.h">
       <Filter>AI\goals\composite</Filter>
-=======
-    <ClInclude Include="armory\Projectile_Grenade.h">
-      <Filter>Game\weapons &amp; projectiles\projectiles</Filter>
-    </ClInclude>
-    <ClInclude Include="armory\Weapon_GrenadeLauncher.h">
-      <Filter>Game\weapons &amp; projectiles\weapons</Filter>
->>>>>>> origin/fuzzy_aim
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -646,9 +630,6 @@
       <Filter>Resource Files\maps</Filter>
     </None>
     <None Include="maps\Raven_DM1_Doors.map">
-      <Filter>Resource Files\maps</Filter>
-    </None>
-    <None Include="maps\Raven_DM1_asTEST.map">
       <Filter>Resource Files\maps</Filter>
     </None>
   </ItemGroup>
