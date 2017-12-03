@@ -18,11 +18,11 @@ void Goal_FleeProjectile::Activate()
 
 	Vector2D projectileDeplamentVector = (m_objectToDodge->getImpactPoint() - m_objectToDodge->Pos());
 	projectileDeplamentVector.Normalize();
-
-	double accuracy = 20;
+	//arbitrary accuracy
+	double accuracyDegree = 20;
 	//angle between the bot and the projectile
-	bool isNearlyParrallele = clockwiseAngleBetweenVector(projectileDeplamentVector, botDeplamentVector) < accuracy ||
-							  clockwiseAngleBetweenVector(projectileDeplamentVector, botDeplamentVector) > (180 - accuracy);
+	bool isNearlyParrallele = clockwiseAngleBetweenVector(projectileDeplamentVector, botDeplamentVector) < accuracyDegree ||
+							  clockwiseAngleBetweenVector(projectileDeplamentVector, botDeplamentVector) > (180 - accuracyDegree);
 	//chose the best startegie to dodge the projectil
 	if (isNearlyParrallele) {
 		// dodge to side if parallele
@@ -66,5 +66,5 @@ void Goal_FleeProjectile::Terminate()
 double clockwiseAngleBetweenVector(Vector2D a, Vector2D b) {
 	double dot = a.x*b.y + a.y*b.y;
 	double det = a.x*b.y - b.x*a.y;
-	return abs(atan2(dot, det)* 57.2958);
+	return abs(atan2(dot, det)* 57.2958);//* 57.2958 => rad to degree
 }

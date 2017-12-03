@@ -23,13 +23,6 @@ private:
 	//a local copy of the path returned by the path planner
 	std::list<PathEdge>  m_Path;
 	Raven_Projectile* m_objectToDodge;
-
-	//the approximate time the bot should take to travel the target location
-	double     m_dTimeToReachPos;
-
-	//this records the time this goal was activated
-	double     m_dStartTime;
-
 	Vector2D    m_vStrafeTarget;
 	
 

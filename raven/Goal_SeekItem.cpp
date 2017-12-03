@@ -13,6 +13,7 @@ Goal_SeekItem(Raven_Bot*          pBot,
 void Goal_SeekItem::Activate()
 {
 	m_iStatus = active;
+	//by default the bot follow the path to the item
 	AddSubgoal(new Goal_FollowPath(m_pOwner, m_Path));
 
 }
@@ -29,8 +30,6 @@ int Goal_SeekItem::Process()
 	std::list<Raven_Projectile*> projectileList = m_pOwner->GetWorld()->GetAllProjectils();
 	//Create an iterator of std::list
 	std::list<Raven_Projectile*>::iterator it;
-
-
 
 	bool needToDodge = false;
 	double distanceCurrentProjectile = 0;
@@ -85,11 +84,9 @@ bool Goal_SeekItem::projectileWillHitBot(Raven_Projectile* proj)
 	{
 		//there is an intersection between the travel course of the bot and the projectile
 		if (DistToLineSegment(From, To, m_pOwner->Pos()) < (m_pOwner->BRadius() * 2)) {
-			debug_con << "y" << "";
 			return true;
 		}
 	}
-	debug_con << "n" << "";
 	return false;
 }
 
