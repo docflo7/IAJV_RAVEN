@@ -13,6 +13,10 @@
 #include "Raven_WeaponSystem.h"
 #include "Raven_SensoryMemory.h"
 
+#include "NeuralNetwork.h"
+#include "TrainingDataReader.h"
+#include "NeuralNetworkTrainer.h"
+
 #include "Messaging/Telegram.h"
 #include "Raven_Messages.h"
 #include "Messaging/MessageDispatcher.h"
@@ -20,35 +24,41 @@
 #include "goals/Raven_Goal_Types.h"
 #include "goals/Goal_Think.h"
 
+#include <fstream>
+#include <iostream>
+#include "armory\Raven_Weapon.h"
+
+using namespace std;
 
 #include "Debug/DebugConsole.h"
 
+class BPN::Network;
 //-------------------------- ctor ---------------------------------------------
-Raven_Bot::Raven_Bot(Raven_Game* world,Vector2D pos):
+Raven_Bot::Raven_Bot(Raven_Game* world, Vector2D pos, bool bNeural) :
 
-  MovingEntity(pos,
-               script->GetDouble("Bot_Scale"),
-               Vector2D(0,0),
-               script->GetDouble("Bot_MaxSpeed"),
-               Vector2D(1,0),
-               script->GetDouble("Bot_Mass"),
-               Vector2D(script->GetDouble("Bot_Scale"),script->GetDouble("Bot_Scale")),
-               script->GetDouble("Bot_MaxHeadTurnRate"),
-               script->GetDouble("Bot_MaxForce")),
-                 
-                 m_iMaxHealth(script->GetInt("Bot_MaxHealth")),
-                 m_iHealth(script->GetInt("Bot_MaxHealth")),
-                 m_pPathPlanner(NULL),
-                 m_pSteering(NULL),
-                 m_pWorld(world),
-                 m_pBrain(NULL),
-                 m_iNumUpdatesHitPersistant((int)(FrameRate * script->GetDouble("HitFlashTime"))),
-                 m_bHit(false),
-                 m_iScore(0),
-                 m_Status(spawning),
-                 m_bPossessed(false),
-                 m_dFieldOfView(DegsToRads(script->GetDouble("Bot_FOV")))
-           
+	MovingEntity(pos,
+		script->GetDouble("Bot_Scale"),
+		Vector2D(0, 0),
+		script->GetDouble("Bot_MaxSpeed"),
+		Vector2D(1, 0),
+		script->GetDouble("Bot_Mass"),
+		Vector2D(script->GetDouble("Bot_Scale"), script->GetDouble("Bot_Scale")),
+		script->GetDouble("Bot_MaxHeadTurnRate"),
+		script->GetDouble("Bot_MaxForce")),
+
+	m_iMaxHealth(script->GetInt("Bot_MaxHealth")),
+	m_iHealth(script->GetInt("Bot_MaxHealth")),
+	m_pPathPlanner(NULL),
+	m_pSteering(NULL),
+	m_pWorld(world),
+	m_pBrain(NULL),
+	m_iNumUpdatesHitPersistant((int)(FrameRate * script->GetDouble("HitFlashTime"))),
+	m_bHit(false),
+	m_iScore(0),
+	m_Status(spawning),
+	m_bPossessed(false),
+	m_dFieldOfView(DegsToRads(script->GetDouble("Bot_FOV"))), m_bNeural(bNeural), m_nNetwork(NULL),
+	m_bRecording(true), m_bTir(false)
 {
   SetEntityType(type_bot);
 
@@ -69,7 +79,7 @@ Raven_Bot::Raven_Bot(Raven_Game* world,Vector2D pos):
   m_pTargetSelectionRegulator = new Regulator(script->GetDouble("Bot_TargetingUpdateFreq"));
   m_pTriggerTestRegulator = new Regulator(script->GetDouble("Bot_TriggerUpdateFreq"));
   m_pVisionUpdateRegulator = new Regulator(script->GetDouble("Bot_VisionUpdateFreq"));
-
+  m_pDatasetWriteRegulator = new Regulator(25); //save data twice per seconds
   //create the goal queue
   m_pBrain = new Goal_Think(this);
 
@@ -82,6 +92,25 @@ Raven_Bot::Raven_Bot(Raven_Game* world,Vector2D pos):
                                         script->GetDouble("Bot_AimPersistance"));
 
   m_pSensoryMem = new Raven_SensoryMemory(this, script->GetDouble("Bot_MemorySpan"));
+
+  if (m_bNeural == true)
+  {
+	  BPN::Network::Settings networkSettings{ 2, 2, 1 };
+	  m_nNetwork = new BPN::Network(networkSettings);
+
+	  BPN::TrainingDataReader dataReader("dataset.data", 2, 1);
+	  dataReader.ReadData();
+	  BPN::NetworkTrainer::Settings trainerSettings;
+	  trainerSettings.m_learningRate = 0.001;
+	  trainerSettings.m_momentum = 0.9;
+	  trainerSettings.m_useBatchLearning = false;
+	  trainerSettings.m_maxEpochs = 200;
+	  trainerSettings.m_desiredAccuracy = 90;
+
+	  BPN::NetworkTrainer trainer(trainerSettings, m_nNetwork);
+	  trainer.Train(dataReader.GetTrainingData());
+  }
+
 }
 
 //-------------------------------- dtor ---------------------------------------
@@ -101,6 +130,12 @@ Raven_Bot::~Raven_Bot()
   delete m_pVisionUpdateRegulator;
   delete m_pWeaponSys;
   delete m_pSensoryMem;
+  delete m_pDatasetWriteRegulator;
+  if (m_nNetwork != NULL)
+  {
+	  delete m_nNetwork;
+  }
+
 }
 
 //------------------------------- Spawn ---------------------------------------
@@ -115,53 +150,81 @@ void Raven_Bot::Spawn(Vector2D pos)
     SetPos(pos);
     m_pWeaponSys->Initialize();
     RestoreHealthToMaximum();
+
 }
 
 //-------------------------------- Update -------------------------------------
 //
 void Raven_Bot::Update()
 {
-  //process the currently active goal. Note this is required even if the bot
-  //is under user control. This is because a goal is created whenever a user 
-  //clicks on an area of the map that necessitates a path planning request.
-  m_pBrain->Process();
-  
-  //Calculate the steering force and update the bot's velocity and position
-  UpdateMovement();
+	//process the currently active goal. Note this is required even if the bot
+	//is under user control. This is because a goal is created whenever a user 
+	//clicks on an area of the map that necessitates a path planning request.
+	m_pBrain->Process();
 
-  //if the bot is under AI control but not scripted
-  if (!isPossessed())
-  {           
-    //examine all the opponents in the bots sensory memory and select one
-    //to be the current target
-    if (m_pTargetSelectionRegulator->isReady())
-    {      
-      m_pTargSys->Update();
-    }
+	//Calculate the steering force and update the bot's velocity and position
+	UpdateMovement();
 
-    //appraise and arbitrate between all possible high level goals
-    if (m_pGoalArbitrationRegulator->isReady())
-    {
-       m_pBrain->Arbitrate(); 
-    }
+	//if the bot is under AI control but not scripted
+	if (!isPossessed())
+	{
+		//examine all the opponents in the bots sensory memory and select one
+		//to be the current target
+		if (m_pTargetSelectionRegulator->isReady())
+		{
+			m_pTargSys->Update();
+		}
 
-    //update the sensory memory with any visual stimulus
-    if (m_pVisionUpdateRegulator->isReady())
-    {
-      m_pSensoryMem->UpdateVision();
-    }
-  
-    //select the appropriate weapon to use from the weapons currently in
-    //the inventory
-    if (m_pWeaponSelectionRegulator->isReady())
-    {       
-      m_pWeaponSys->SelectWeapon();       
-    }
+		//appraise and arbitrate between all possible high level goals
+		if (m_pGoalArbitrationRegulator->isReady())
+		{
+			m_pBrain->Arbitrate();
+		}
 
-    //this method aims the bot's current weapon at the current target
-    //and takes a shot if a shot is possible
-    m_pWeaponSys->TakeAimAndShoot();
-  }
+		//update the sensory memory with any visual stimulus
+		if (m_pVisionUpdateRegulator->isReady())
+		{
+			m_pSensoryMem->UpdateVision();
+		}
+
+		//select the appropriate weapon to use from the weapons currently in
+		//the inventory
+		if (m_pWeaponSelectionRegulator->isReady())
+		{
+			m_pWeaponSys->SelectWeapon();
+		}
+
+		//this method aims the bot's current weapon at the current target
+		//and takes a shot if a shot is possible
+		if(m_bNeural)
+		{
+			Raven_Weapon* currWeapon = this->GetWeaponSys()->GetCurrentWeapon();
+			double weaponType = currWeapon->GetType();
+			double weaponAmmo = this->GetWeaponSys()->GetAmmoRemainingForWeapon(weaponType);
+			debug_con << "Evalutate = " << m_nNetwork->Evaluate({ weaponType,weaponAmmo }).at(0) << "\n";
+			if (m_nNetwork->Evaluate({ weaponType,weaponAmmo }) == std::vector<int32_t>{-1})
+			{
+				m_pWeaponSys->TakeAimAndShoot();
+			}
+		}
+		
+		else
+			m_pWeaponSys->TakeAimAndShoot();
+	}
+	else
+	{
+		if (m_pDatasetWriteRegulator->isReady() && m_bRecording == true)
+		{
+			if (m_bTir)
+			{
+				WriteDataSet();
+			}
+			else
+			{
+				m_bTir = false;
+			}
+		}
+	}
 }
 
 
@@ -587,4 +650,38 @@ void Raven_Bot::IncreaseHealth(unsigned int val)
 {
   m_iHealth+=val; 
   Clamp(m_iHealth, 0, m_iMaxHealth);
+}
+
+
+
+void Raven_Bot::WriteDataSet(int tir) {
+	//calculate angle with target
+	//Vector2D toTarget = Vec2DNormalize(GetTargetBot()->Pos() - m_vPosition);
+	//double dot = m_vFacing.Dot(toTarget);
+	//Clamp(dot, -1, 1);
+	//double angle = acos(dot);
+
+	//get target visible time
+	//double time = GetTargetSys()->GetTimeTargetHasBeenVisible();
+
+	//get weapon
+	Raven_Weapon* currWeapon = this->GetWeaponSys()->GetCurrentWeapon();
+	int weaponType = currWeapon->GetType();
+	int weaponAmmo = this->GetWeaponSys()->GetAmmoRemainingForWeapon(weaponType);
+	if (tir == 1)
+	{
+		m_bTir = 1;
+	}
+	//write to file
+	ofstream dataset;
+	dataset.open("dataset.data", ios::ate | ios::app);
+	if (dataset.is_open())
+	{
+		dataset << weaponType << " ";
+		dataset << weaponAmmo << " ";
+		dataset << tir << " ";
+		dataset << "\n";
+		dataset.close();
+	}
+	
 }

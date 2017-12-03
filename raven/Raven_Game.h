@@ -100,6 +100,7 @@ public:
   void AddBolt(Raven_Bot* shooter, Vector2D target);
   void AddGrenade(Raven_Bot* shooter, Vector2D target);
 
+  void AddNeuralBot();
   void AddPlayer();
   //Remove every Mouse's action in querie
   void StopAction();

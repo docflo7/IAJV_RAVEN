@@ -202,7 +202,31 @@ void Raven_Game::Update()
 		m_bRemoveABot = false;
 	}
 }
+//-------------------------- AddPNeurolBot --------------------------------------
+//
+//  Adds a bot and switches on the default steering behavior
+//-----------------------------------------------------------------------------
+void Raven_Game::AddNeuralBot()
+{
+	//create a bot. (its position is irrelevant at this point because it will
+	//not be rendered until it is spawned)
+	Raven_Bot* rb = new Raven_Bot(this, Vector2D(),true);
 
+	//switch the default steering behaviors on
+	rb->GetSteering()->WallAvoidanceOn();
+	rb->GetSteering()->SeparationOn();
+
+	m_Bots.push_back(rb);
+
+	//register the bot with the entity manager
+	EntityMgr->RegisterEntity(rb);
+
+
+#ifdef LOG_CREATIONAL_STUFF
+	debug_con << "Adding bot with ID " << ttos(rb->ID()) << "";
+#endif
+
+}
 
 //-------------------------- AddPlayer --------------------------------------
 //
@@ -591,6 +615,10 @@ void Raven_Game::ClickLeftMouseButton(POINTS p)
 	if (m_pSelectedBot && m_pSelectedBot->isPossessed())
 	{
 		m_pSelectedBot->FireWeapon(POINTStoVector(p));
+		if (m_pSelectedBot->isRecording())
+		{
+			m_pSelectedBot->WriteDataSet(1);
+		}
 	}
 }
 
