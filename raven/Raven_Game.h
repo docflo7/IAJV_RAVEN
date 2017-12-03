@@ -159,7 +159,7 @@ public:
   const std::list<Raven_Bot*>&             GetAllBots()const{return m_Bots;}
   PathManager<Raven_PathPlanner>* const    GetPathManager(){return m_pPathManager;}
   int                                      GetNumBots()const{return m_Bots.size();}
-
+  std::list<Raven_Projectile*>             GetAllProjectils()const { return m_Projectiles; };
   
   void  TagRaven_BotsWithinViewRange(BaseGameEntity* pRaven_Bot, double range)
               {TagNeighbors(pRaven_Bot, m_Bots, range);}  

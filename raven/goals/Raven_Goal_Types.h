@@ -23,8 +23,9 @@ enum
   goal_hunt_target,
   goal_strafe,
   goal_adjust_range,
-  goal_say_phrase
-  
+  goal_say_phrase,
+  goal_dodge_element,
+  goal_wander_to_item
 };
 
 class GoalTypeToString : public TypeToString

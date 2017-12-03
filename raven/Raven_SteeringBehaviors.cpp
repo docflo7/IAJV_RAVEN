@@ -181,6 +181,12 @@ Vector2D Raven_Steering::CalculatePrioritized()
     if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
   }
 
+  if (On(flee))
+  {
+	  force = Flee(m_vTarget) * m_dWeightSeek;
+
+	  if (!AccumulateForce(m_vSteeringForce, force)) return m_vSteeringForce;
+  }
 
   if (On(arrive))
   {
@@ -217,6 +223,21 @@ Vector2D Raven_Steering::Seek(const Vector2D &target)
   return (DesiredVelocity - m_pRaven_Bot->Velocity());
 }
 
+/////////////////////////////////////////////////////////////////////////////// START OF BEHAVIORS
+
+//------------------------------- Flee -----------------------------------
+//
+//  Given a target, this behavior returns a steering force which will
+//  direct the agent towards the target
+//------------------------------------------------------------------------
+Vector2D Raven_Steering::Flee(const Vector2D &target)
+{
+
+	Vector2D DesiredVelocity = Vec2DNormalize( m_pRaven_Bot->Pos() -target)
+		* m_pRaven_Bot->MaxSpeed();
+
+	return (DesiredVelocity - m_pRaven_Bot->Velocity());
+}
 
 //--------------------------- Arrive -------------------------------------
 //

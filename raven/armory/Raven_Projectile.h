@@ -112,6 +112,9 @@ public:
   bool HasImpacted()const{return m_bImpacted;}
 
 
+  int getShooterID() { return m_iShooterID; };
+  Vector2D getOrigin() { return m_vOrigin; };
+  Vector2D getImpactPoint() { return m_vTarget; };
 
 };
 
