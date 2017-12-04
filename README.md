@@ -43,7 +43,8 @@ Stievenard Thomas
 
 - Autre
 
-  Weapon_GrenadeLauncher: 
-  > Ajout d'une nouvelle arme: la grenade
-  Utilisée principalement sur les groupes d'ennemis
+  Weapon_GrenadeLauncher:
+  
+			 Ajout d'une nouvelle arme: la grenade.
+  			 Utilisée principalement sur les groupes d'ennemis.
   
