@@ -1,6 +1,39 @@
 # IAJV_RAVEN
 
-Dossier common : j'ai mis la version de lua qui fonctionne pour VS2017 (et une sauvegarde de la vieille)  
-Le reste du dossier common est à rajouter en local.  
+# Equipe
+Desrousseaux Florian
+Dupont François
+Edorh François
+Guison Vianney
+Stievenard Thomas 
 
-Dossier raven : fichiers du projet. J'ai tout mis sur le git sauf le dossier ipch.  
+#Ajouts
+
+- Réseau neuronal
+< ... >
+
+- Logique floue
+  Weapon_RocketLauncher:
+			 > 5 intervalles au lieu de 3 pour chaque variable floue.
+  			 > - DistToTarget: VeryClose, Close, Medium, Far, FarAway
+			 > - AmmoStatus: NearlyOut, Low, Okay, Plenty, Loads
+			 > - Desirability: Undersirable, SomewhatDesirable, Desirable, QuiteDesirable, VeryDesirable
+
+  AddNoiseToAim:  
+		    > Utilisation de la logique floue pour le calcul du bruit à ajouter à un tir.
+		    > Variables floues utilisées:
+		    > - DistToTarget (distance entre le bot et sa cible)
+		    > - SpeedRatio (vitesse actuelle du bot par rapport à sa vitesse maximale)
+		    > - TimeTargetVisible (durée pendant laquelle la cible du bot a été visible)
+
+
+- Gameplay
+< ... >
+
+
+
+- Autre
+  Weapon_GrenadeLauncher: 
+  > Ajout d'une nouvelle arme: la grenade
+  Utilisée principalement sur les groupes d'ennemis
+  
