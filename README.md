@@ -9,7 +9,7 @@ Edorh François (EDOF19059507)
 
 Guison Vianney (GUIV30069402)
 
-Stievenard Thomas 
+Stievenard Thomas (STIT31079507)
 
 # Ajouts
 
@@ -37,7 +37,26 @@ Stievenard Thomas
 
 - Gameplay
 
-< ... >
+AddPlayer
+>Ajout d'un bot, qui sera directement possédé
+
+ChangePlayerVelocity
+>Est appelé si on controle le joueur avec le clavier.
+Prend en compte les touches appuyés pour détérminer la direction du joueur
+
+Dans les menus on peut choisir d'ajouter un joueur, de controler le joueur avec la souris ou le clavier
+et on peut définir quel type de clavier nous utilisons (QWERTY ou AZERTY) pour changer les touches servant au déplacement
+
+Dans les menus, si un joueur est présent sur le terrain, le bouton 'ADD Player' est grisé pour éviter 
+d'ajouter deux fois un personnage-joueur (ce qui n'est pas possible dans le code)
+
+Les touches allant de 1 à 6 permettent de changer d'armes, le pointeur de la souris définit où le personnage vise,
+le clic gauche permet de tirer, le clic droit permet de changer de bot controlé
+
+Si on est en mode souris, le clic droit permet de donner la position a atteindre, en restant appuyé sur 'Q' tout en cliquant on
+définir plusieurs positions succéssives à atteindre
+
+Si on est en mode clavier, ZQSD (en AZERTY) ou WASD en (QWERTY) permettent de donner la direction du personnage 
 
 
 
