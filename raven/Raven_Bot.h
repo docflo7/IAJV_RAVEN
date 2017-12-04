@@ -206,7 +206,6 @@ public:
   void			changeRecord(void) { m_bRecording = !m_bRecording; }
 
   //Write data
-  Raven_Bot*	GetClosestTargetToAim(POINT p);
   void			WriteDataSet(int tir = 0);
   bool			isRecording(void) { return m_bRecording; }
 
