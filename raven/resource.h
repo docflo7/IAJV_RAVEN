@@ -29,7 +29,7 @@
 #define IDM_GAME_MOUSE					40022
 #define IDM_GAME_KEYBOARD				40023
 #define IDM_NEURAL_ADD					40024
-
+#define IDM_NEURAL_RECORD				40025
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

@@ -102,6 +102,7 @@ public:
 
   void AddNeuralBot();
   void AddPlayer();
+  void ChangeRecord();
   //Remove every Mouse's action in querie
   void StopAction();
 

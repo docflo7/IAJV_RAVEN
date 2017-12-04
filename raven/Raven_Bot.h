@@ -203,10 +203,9 @@ public:
   bool          canStepRight(Vector2D& PositionOfStep)const;
   bool          canStepForward(Vector2D& PositionOfStep)const;
   bool          canStepBackward(Vector2D& PositionOfStep)const;
-
+  void			changeRecord(void) { m_bRecording = !m_bRecording; }
 
   //Write data
-  Raven_Bot*	GetClosestTargetToAim(POINT p);
   void			WriteDataSet(int tir = 0);
   bool			isRecording(void) { return m_bRecording; }
 

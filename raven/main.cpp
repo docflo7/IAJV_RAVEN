@@ -114,6 +114,7 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
         CheckMenuItemAppropriately(hwnd, IDM_BOTS_SHOW_GOAL_Q, UserOptions->m_bShowGoalsOfSelectedBot);
         CheckMenuItemAppropriately(hwnd, IDM_NAVIGATION_SHOW_INDICES, UserOptions->m_bShowNodeIndices);
         CheckMenuItemAppropriately(hwnd, IDM_BOTS_SHOW_SENSED, UserOptions->m_bShowOpponentsSensedBySelectedBot);
+		CheckMenuItemAppropriately(hwnd, IDM_NEURAL_RECORD, UserOptions->m_bRecord);
 
       }
 
@@ -383,6 +384,14 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
         CheckMenuItemAppropriately(hwnd, IDM_BOTS_SHOW_GOAL_Q, UserOptions->m_bShowGoalsOfSelectedBot);
 
         break;
+
+	  case IDM_NEURAL_RECORD:
+
+		  UserOptions->m_bRecord = !UserOptions->m_bRecord;
+
+		  CheckMenuItemAppropriately(hwnd, IDM_NEURAL_RECORD, UserOptions->m_bRecord);
+		  g_pRaven->ChangeRecord();
+		  break;
 
 	  case IDM_NEURAL_ADD:
 		  g_pRaven->AddNeuralBot();

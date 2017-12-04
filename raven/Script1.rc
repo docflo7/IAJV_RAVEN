@@ -67,6 +67,7 @@ BEGIN
 	POPUP "Neural Network"
 	BEGIN
 		MENUITEM "Add Neural Bot",				IDM_NEURAL_ADD
+		MENUITEM "Record Data",				IDM_NEURAL_RECORD
 	END
 END
 

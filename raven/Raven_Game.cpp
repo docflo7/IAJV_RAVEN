@@ -939,3 +939,16 @@ void Raven_Game::Render()
 		}
 	}
 }
+
+
+void Raven_Game::ChangeRecord()
+{
+	std::list<Raven_Bot*> Liste =this->GetAllBots();
+	
+	int i;
+	for (i = 0; i < (int)Liste.size(); i++)
+	{
+		Liste.front()->changeRecord();
+		Liste.pop_front();
+	}
+}
