@@ -3,7 +3,7 @@
 # Equipe
 Desrousseaux Florian (DESF28039508)
 
-Dupont François
+Duport François 
 
 Edorh François (EDOF19059507)
 
@@ -15,7 +15,9 @@ Stievenard Thomas (STIT31079507)
 
 - Réseau neuronal
 
-< ... >
+            Nous avons ajouter un bot apprennant, utilisant la bibliothèque de réseau de neurones disponible à cette adresse : https://github.com/BobbyAnguelov/NeuralNetwork  
+            Lorsqu'un bot neural est ajouté au jeu, il apprend automatiquement à partir de données de jeu enregistrée, pour lui permettre de décider quand tirer.  
+            Les données de jeux sont créées lorsque l'on prend le contrôle d'un bot, et que l'option "Record Data" est cochée dans le menu "Neural Network"
 
 - Logique floue
 
