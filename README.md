@@ -1,13 +1,13 @@
 # IAJV_RAVEN
 
 # Equipe
-Desrousseaux Florian
+Desrousseaux Florian (DESF28039508)
 
 Dupont François
 
-Edorh François
+Edorh François (EDOF19059507)
 
-Guison Vianney
+Guison Vianney (GUIV30069402)
 
 Stievenard Thomas 
 
